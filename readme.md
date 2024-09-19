@@ -1,5 +1,5 @@
 # PDF Manipulator
-
+use it live here: [Link](https://privpdf.com)
 ## Overview
 
 PDF Manipulator is a powerful web-based tool that allows users to securely edit, merge, split, extract, and download PDF files without exposing their documents to third-party services. Built using PDF.js and PDF-Lib, this application provides a user-friendly interface for managing PDF documents directly in the browser.
@@ -20,7 +20,7 @@ To run the PDF Manipulator locally, follow these steps:
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/yourusername/pdf-manipulator.git
+   git clone https://github.com/Neural-Nirvana/pdf-manipulator.git
    cd pdf-manipulator
    ```
 
