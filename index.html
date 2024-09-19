@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Manipulator</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Include PDF.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js"></script>
+
+    <!-- Include PDF-Lib library -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+</head>
+<body>
+    <div class="container">
+        <h1>PDF Manipulator</h1>
+        <div class="file-input-wrapper">
+            <input type="file" id="pdfInput" accept=".pdf">
+            <label for="pdfInput">Choose PDF file</label>
+        </div>
+        <div id="pdfPreview"></div>
+        <div class="page-navigation">
+            <button id="prevPage">Previous</button>
+            <span id="pageInfo">Page <span id="pageNum">1</span> of <span id="pageCount">1</span></span>
+            <button id="nextPage">Next</button>
+        </div>
+        <div class="controls">
+            <button id="addPage">Add Page</button>
+            <button id="deletePage">Delete Page</button>
+            <button id="reorderPages">Move Page Up</button>
+            <button id="rotatePage">Rotate Page</button>
+            <button id="extractPages">Extract Page</button>
+            <button id="splitPDF">Split PDF</button>
+            <label for="mergePdfInput" class="button">Merge PDFs</label>
+            <button id="downloadPDF">Download PDF</button> <!-- New Download Button -->
+        </div>
+        <div id="output"></div>
+        <!-- Add this inside your .container div -->
+        <div class="file-input-wrapper">
+            <!-- Visible file input for merging PDFs -->
+            <input type="file" id="mergePdfInput" class="merge-input" accept=".pdf" multiple>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
