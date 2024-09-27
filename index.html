@@ -11,7 +11,7 @@
 
     <!-- Include PDF.js library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js" defer></script>
     <script data-goatcounter="https://privpdf.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
     <!-- Include PDF-Lib library -->
@@ -23,18 +23,40 @@
     <meta property="og:image" content="path/to/your/image.jpg"> <!-- Replace with your image path -->
     <meta property="og:url" content="https://privpdf.com/"> <!-- Replace with your website URL -->
     <meta property="og:type" content="website">
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          "name": "Private PDF Editor",
+          "url": "https://privpdf.com/",
+          "description": "Edit your confidential PDF files locally and securely without uploading to any server. Merge, split, rotate, and manipulate PDFs privately with our offline PDF editor.",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Windows, macOS, Linux",
+          "browserRequirements": "Requires JavaScript. Compatible with modern browsers.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "author": {
+            "@type": "Organization",
+            "name": "Neural Nirvana"
+          }
+        }
+    </script>
 </head>
 <body>
     <div class="container">
-        <h1>Private PDF Manipulator</h1>
-        <p>Welcome to the PrivatePDF Manipulator! This tool allows you to locally and securely edit your PDF files without exposing them to any third-party services. You can:</p>
+        <h1>Private PDF Editor - Securely Edit Your PDFs Offline</h1>
+        <p>Edit your confidential PDF files locally without uploading them to any server. Our Private PDF Editor allows you to manipulate your PDFs securely and privately on your device. You can:</p>
         <ul>
-            <li><strong>Add Pages:</strong> Insert blank pages or pages from other PDFs.</li>
-            <li><strong>Delete Pages:</strong> Remove unwanted pages from your documents.</li>
-            <li><strong>Reorder Pages:</strong> Change the order of pages in your PDF.</li>
-            <li><strong>Extract Pages:</strong> Save specific pages as new PDF files.</li>
-            <li><strong>Split PDFs:</strong> Divide your PDF into multiple documents.</li>
-            <li><strong>Merge PDFs:</strong> Combine multiple PDF files into one.</li>
+            <li><strong>Add Pages:</strong> Insert blank pages or pages from other PDFs without internet connection.</li>
+            <li><strong>Delete Pages:</strong> Remove unwanted pages securely.</li>
+            <li><strong>Reorder Pages:</strong> Change the order of pages in your PDF easily.</li>
+            <li><strong>Rotate Pages:</strong> Adjust page orientation as needed.</li>
+            <li><strong>Extract Pages:</strong> Save specific pages as new PDF files locally.</li>
+            <li><strong>Split PDFs:</strong> Divide your PDF into multiple documents offline.</li>
+            <li><strong>Merge PDFs:</strong> Combine multiple PDF files into one without uploading.</li>
             <li><strong>Download PDFs:</strong> Save your manipulated PDFs securely to your device.</li>
         </ul>
         <p>All your files are processed locally on your device and no data is shared with any third parties.</p>
@@ -66,5 +88,10 @@
         </div>
     </div>
     <script src="script.js"></script>
+        <footer>
+            <p>&copy; 2023 Neural Nirvana. All rights reserved.</p>
+        </footer>
+        
+
 </body>
 </html>
