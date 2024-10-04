@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Compression Tool - Compress PDF Files Locally | Free Online Tool</title>
+    <meta name="description" content="Compress your PDF files locally and securely with our free online PDF compression tool. Reduce file size without uploading." />
+    <meta name="keywords" content="pdf compression, compress pdf, online pdf compression, reduce pdf size, free pdf compressor, secure pdf compression" />
+
+    <!-- Open Graph Meta Tags for Social Sharing -->
+    <meta property="og:title" content="PDF Compression Tool - Compress PDF Files Locally" />
+    <meta property="og:description" content="Compress your PDF files locally and securely with our free online PDF compression tool. Reduce file size without uploading." />
+    <meta property="og:image" content="path/to/preview-image.jpg" />
+    <meta property="og:url" content="https://yourwebsite.com/pdf-compression.html" />
+    <meta property="og:type" content="website" />
+
+    <!-- Structured Data (Schema.org) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "PDF Compression Tool",
+      "url": "https://privpdf.com/pdf-compression.html",
+      "description": "Compress your PDF files locally and securely with our free online PDF compression tool. Reduce file size without uploading.",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Windows, macOS, Linux",
+      "browserRequirements": "Requires JavaScript. Compatible with modern browsers.",
+      "author": {
+        "@type": "Organization",
+        "name": "Neural Nirvana"
+      }
+    }
+    </script>
+
+    <link rel="stylesheet" href="styles.css">
+    <!-- Include PDF-Lib library -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+</head>
+<body>
+    <header>
+        <img src="https://storage.googleapis.com/cchat.in/uploads/2%20(1)%20(1).png">
+        <h1>PDF Compression Tool - Compress Your PDFs Securely</h1>
+    </header>
+    <div class="container">
+        <p>Use this tool to reduce the size of your PDF files without uploading them. All processing happens locally on your device.</p>
+
+        <!-- File input for the PDF file -->
+        <div class="file-input-wrapper">
+            <label for="pdfInput">Choose PDF file</label>
+            <input type="file" id="pdfInput" accept=".pdf">
+        </div>
+
+        <!-- Compression quality input -->
+        <div class="compression-quality-wrapper">
+            <label for="compressionQuality">Select Compression Quality</label>
+            <input type="range" id="compressionQuality" min="1" max="10" value="7">
+            <span id="qualityValue">7</span> <!-- Display the current value -->
+        </div>
+
+        <!-- Button to compress PDF -->
+        <button id="compressPDF" style="display:none;">Compress PDF</button>
+
+        <!-- Button to download the compressed PDF -->
+        <button id="downloadPDF" style="display:none;">Download Compressed PDF</button>
+
+        <div id="output"></div>
+    </div>
+
+    <script src="pdf-compression.js"></script>
+    <footer><a href="index.html">Home</a></footer>
+</body>
+<style>
+    header {
+    background-color: #b7b7d7;
+    color: rgb(67, 67, 67);
+    text-align: center;
+    padding: 20px;
+}
+</style>
+</html>

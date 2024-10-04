@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrivatePDF Manipulator - Edit, Merge, Split, and Download PDFs Securely, locally and privately</title>
+    <meta name="description" content="Easily manipulate your PDF files. Add, delete, reorder, extract, split, and merge PDFs locally and privately without exposing your documents to third parties.">
+    <meta name="keywords" content="private PDF manipulator, edit PDF, merge PDF, split PDF, extract PDF, secure PDF editing, local PDF manipulation, online PDF tools">
+    <meta name="author" content="Neural Nirvana">
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Include PDF.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js" defer></script>
+    <script data-goatcounter="https://privpdf.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+    <!-- Include PDF-Lib library -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+    <!-- Open Graph Meta Tags for Social Media Sharing -->
+    <meta property="og:title" content="Private PDF Manipulator">
+    <meta property="og:description" content="Manipulate your PDF files locally, securely and privately without exposing them to third parties.">
+    <meta property="og:image" content="https://storage.googleapis.com/cchat.in/uploads/Untitled%20design%20(9).png"> <!-- Replace with your image path -->
+    <meta property="og:url" content="https://privpdf.com/"> <!-- Replace with your website URL -->
+    <meta property="og:type" content="website">
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          "name": "Private PDF Editor",
+          "url": "https://privpdf.com/",
+          "description": "Edit your confidential PDF files locally and securely without uploading to any server. Merge, split, rotate, and manipulate PDFs privately with our offline PDF editor.",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Windows, macOS, Linux",
+          "browserRequirements": "Requires JavaScript. Compatible with modern browsers.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "author": {
+            "@type": "Organization",
+            "name": "Neural Nirvana"
+          }
+        }
+    </script>
+    <link rel="icon" href="https://storage.googleapis.com/cchat.in/uploads/Untitled%20design%20(9).png" type="image/png">
+</head>
+<body>
+    <header>
+        <img src="https://storage.googleapis.com/cchat.in/uploads/2%20(1)%20(1).png">
+        <h1>Private PDF Editor</h1>
+    </header>
+    <div class="container">
+        <!-- <ul>
+            <li><strong>Add Pages:</strong> Insert blank pages or pages from other PDFs without internet connection.</li>
+            <li><strong>Delete Pages:</strong> Remove unwanted pages securely.</li>
+            <li><strong>Reorder Pages:</strong> Change the order of pages in your PDF easily.</li>
+            <li><strong>Rotate Pages:</strong> Adjust page orientation as needed.</li>
+            <li><strong>Extract Pages:</strong> Save specific pages as new PDF files locally.</li>
+            <li><strong>Split PDFs:</strong> Divide your PDF into multiple documents offline.</li>
+            <li><strong>Merge PDFs:</strong> Combine multiple PDF files into one without uploading.</li>
+            <li><strong>Watermark PDFs:</strong>click <a href="/watermark.html">here</a> to watermark your PDFs</li>
+        </ul> -->
+        <p>All your files are processed locally on your device and no data is shared with any third parties.</p>
+        <div class="file-input-wrapper">
+            <input type="file" id="pdfInput" accept=".pdf">
+            <label for="pdfInput">📤Choose PDF file</label>
+        </div>
+        <div id="pdfPreview"></div>
+        <div class="page-navigation">
+            <button id="prevPage">Previous</button>
+            <span id="pageInfo">Page <span id="pageNum">1</span> of <span id="pageCount">1</span></span>
+            <button id="nextPage">Next</button>
+        </div>
+        <div class="controls">
+            <button id="addPage">➕📄 Add Page</button>
+            <button id="deletePage">❌📄 Delete Page</button>
+            <button id="reorderPages">🔼📄 Move Page Up</button>
+            <button id="rotatePage">🔄📄 Rotate Page</button>
+            <button id="extractPages">✂️📄 Extract Page</button>
+            <button id="splitPDF">📄 ➡️ 📄📄 Split PDF</button>
+            <label for="mergePdfInput" class="button">📄➕📄 Merge PDFs</label>
+            <button id="downloadPDF">⬇️📄 Download PDF</button>
+        </div>
+        
+        <div id="output"></div>
+        <!-- Add this inside your .container div -->
+        <div class="file-input-wrapper">
+            <!-- Visible file input for merging PDFs -->
+            <input type="file" id="mergePdfInput" class="merge-input" accept=".pdf" multiple>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <p>Edit your confidential PDF files locally without uploading them to any server. Our Private PDF Editor allows you to manipulate your PDFs securely and privately on your device.</p>
+
+        <footer>
+            <p>&copy; 2023 Neural Nirvana. All rights reserved.</p>
+            <a href="image-to-pdf.html">Confidential Image to PDF</a><br>
+            <a href="watermark.html">Confidential PDF Watermarking</a><br>
+            <a href="index.html">Home</a>
+            <a href="privacy-policy.html">Privacy Policy</a>
+        </footer>
+        <style>
+            header {
+            background-color: #b7b7d7;
+            color: rgb(67, 67, 67);
+            text-align: center;
+            padding: 20px;
+        }
+        </style>
+        
+
+</body>
+</html>

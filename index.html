@@ -3,98 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrivatePDF Manipulator - Edit, Merge, Split, and Download PDFs Securely, locally and privately</title>
-    <meta name="description" content="Easily manipulate your PDF files. Add, delete, reorder, extract, split, and merge PDFs locally and privately without exposing your documents to third parties.">
-    <meta name="keywords" content="private PDF manipulator, edit PDF, merge PDF, split PDF, extract PDF, secure PDF editing, local PDF manipulation, online PDF tools">
-    <meta name="author" content="Neural Nirvana">
-    <link rel="stylesheet" href="styles.css">
+    <title>PrivatePDF Manipulator - Local, offline and private PDF Editing | Free and Confidential</title>
+    <meta name="description" content="Discover a range of secure and confidential online PDF tools to compress, convert, and manipulate your PDF files without uploading. Perfect for privacy-focused users." />
+    <meta name="keywords" content="pdf tools, secure pdf, online pdf editor, compress pdf, merge pdf, split pdf, confidential pdf, free pdf tools" />
 
-    <!-- Include PDF.js library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js" defer></script>
-    <script data-goatcounter="https://privpdf.goatcounter.com/count"
-        async src="//gc.zgo.at/count.js"></script>
-    <!-- Include PDF-Lib library -->
-    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <!-- Open Graph Meta Tags for Social Sharing -->
+    <meta property="og:title" content="Secure PDF Tools - Confidential Online PDF Manipulation" />
+    <meta property="og:description" content="Use secure and confidential PDF tools online. Compress, convert, and manipulate PDFs without uploading to a server." />
+    <meta property="og:image" content="https://storage.googleapis.com/cchat.in/uploads/Untitled%20design%20(9).png" />
+    <meta property="og:url" content="https://privpdf.com" />
+    <meta property="og:type" content="website" />
 
-    <!-- Open Graph Meta Tags for Social Media Sharing -->
-    <meta property="og:title" content="Private PDF Manipulator">
-    <meta property="og:description" content="Manipulate your PDF files locally, securely and privately without exposing them to third parties.">
-    <meta property="og:image" content="path/to/your/image.jpg"> <!-- Replace with your image path -->
-    <meta property="og:url" content="https://privpdf.com/"> <!-- Replace with your website URL -->
-    <meta property="og:type" content="website">
+    <!-- Structured Data (Schema.org) -->
     <script type="application/ld+json">
         {
-          "@context": "https://schema.org",
-          "@type": "WebApplication",
-          "name": "Private PDF Editor",
-          "url": "https://privpdf.com/",
-          "description": "Edit your confidential PDF files locally and securely without uploading to any server. Merge, split, rotate, and manipulate PDFs privately with our offline PDF editor.",
-          "applicationCategory": "BusinessApplication",
-          "operatingSystem": "Windows, macOS, Linux",
-          "browserRequirements": "Requires JavaScript. Compatible with modern browsers.",
-          "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-          },
-          "author": {
-            "@type": "Organization",
-            "name": "Neural Nirvana"
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "Private PDF Editor",
+            "url": "https://privpdf.com/",
+            "description": "Edit your confidential PDF files locally and securely without uploading to any server. Merge, split, rotate, and manipulate PDFs privately with our offline PDF editor.",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Windows, macOS, Linux",
+            "browserRequirements": "Requires JavaScript. Compatible with modern browsers.",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "author": {
+              "@type": "Organization",
+              "name": "Neural Nirvana"
+            }
           }
-        }
     </script>
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="https://storage.googleapis.com/cchat.in/uploads/Untitled%20design%20(9).png" type="image/png">
 </head>
 <body>
-    <div class="container">
-        <h1>Private PDF Editor - Securely Edit Your PDFs Offline</h1>
-        <p>Edit your confidential PDF files locally without uploading them to any server. Our Private PDF Editor allows you to manipulate your PDFs securely and privately on your device. You can:</p>
-        <ul>
-            <li><strong>Add Pages:</strong> Insert blank pages or pages from other PDFs without internet connection.</li>
-            <li><strong>Delete Pages:</strong> Remove unwanted pages securely.</li>
-            <li><strong>Reorder Pages:</strong> Change the order of pages in your PDF easily.</li>
-            <li><strong>Rotate Pages:</strong> Adjust page orientation as needed.</li>
-            <li><strong>Extract Pages:</strong> Save specific pages as new PDF files locally.</li>
-            <li><strong>Split PDFs:</strong> Divide your PDF into multiple documents offline.</li>
-            <li><strong>Merge PDFs:</strong> Combine multiple PDF files into one without uploading.</li>
-            <li><strong>Download PDFs:</strong> Save your manipulated PDFs securely to your device.</li>
-            <li><strong>Watermark PDFs:</strong>click <a href="/watermark.html">here</a> to watermark your PDFs</li>
-        </ul>
-        <p>All your files are processed locally on your device and no data is shared with any third parties.</p>
-        <div class="file-input-wrapper">
-            <input type="file" id="pdfInput" accept=".pdf">
-            <label for="pdfInput">Choose PDF file</label>
+    <header>
+        <img src="https://storage.googleapis.com/cchat.in/uploads/2%20(1)%20(1).png">
+        <h1>Free, Private and local PDF Editing</h1>
+        <p>Your one-stop solution for secure, private, and confidential PDF manipulations. All tools are free and in-browser! No files are uploaded!</p>
+    </header>
+
+    <section class="tools">
+        <div class="tool-card">
+            <a href="home.html">
+            <!-- <h1>📄➕📄 ➡️ 📄</h1> -->
+            <h2>PDF Merge Tool</h2>
+            <p>Merge multiple PDF files into one securely on your device, without exposing your documents.</p>
+</a>
         </div>
-        <div id="pdfPreview"></div>
-        <div class="page-navigation">
-            <button id="prevPage">Previous</button>
-            <span id="pageInfo">Page <span id="pageNum">1</span> of <span id="pageCount">1</span></span>
-            <button id="nextPage">Next</button>
+        <div class="tool-card"><a href="image-to-pdf.html">
+            <!-- <h1>🖼️ ➡️ 📄</h1> -->
+            <h2>Image to PDF Converter</h2>
+            <p>Convert images to PDF securely without uploading your files. Supports JPG, PNG, and more.</p></a>
         </div>
-        <div class="controls">
-            <button id="addPage">Add Page</button>
-            <button id="deletePage">Delete Page</button>
-            <button id="reorderPages">Move Page Up</button>
-            <button id="rotatePage">Rotate Page</button>
-            <button id="extractPages">Extract Page</button>
-            <button id="splitPDF">Split PDF</button>
-            <label for="mergePdfInput" class="button">Merge PDFs</label>
-            <button id="downloadPDF">Download PDF</button> <!-- New Download Button -->
+        <div class="tool-card">
+            <a href="home.html">
+                <h2>Add Pages to PDF</h2>
+                <p>Insert blank pages or pages from other PDFs without an internet connection.</p>
+            </a>
         </div>
-        <div id="output"></div>
-        <!-- Add this inside your .container div -->
-        <div class="file-input-wrapper">
-            <!-- Visible file input for merging PDFs -->
-            <input type="file" id="mergePdfInput" class="merge-input" accept=".pdf" multiple>
+        
+        <div class="tool-card">
+            <a href="home.html">
+                <h2>Delete Pages from PDF</h2>
+                <p>Remove unwanted pages securely and easily, all done locally on your device.</p>
+            </a>
         </div>
-    </div>
-    <script src="script.js"></script>
-        <footer>
-            <p>&copy; 2023 Neural Nirvana. All rights reserved.</p>
-            <a href="image-to-pdf.html">Confidential Image to PDF</a><br>
-            <a href="watermark.html">Confidential PDF Watermarking</a>
-        </footer>
+        
+        <div class="tool-card">
+            <a href="home.html">
+                <h2>Reorder PDF Pages</h2>
+                <p>Change the order of pages in your PDF effortlessly and securely.</p>
+            </a>
+        </div>
+        
+        <div class="tool-card">
+            <a href="home.html">
+                <h2>Rotate PDF Pages</h2>
+                <p>Adjust the orientation of your PDF pages as needed, with no internet required.</p>
+            </a>
+        </div>
+        
+        <div class="tool-card">
+            <a href="home.html">
+                <h2>Extract Pages from PDF</h2>
+                <p>Save specific pages as new PDF files locally, ensuring your data stays private.</p>
+            </a>
+        </div>
         
 
+        <div class="tool-card"><a href="pdf-compression.html">
+            <!-- <h1>📄 🔽 📉</h1> -->
+            <h2>PDF Compression Tool</h2>
+            <p>Reduce the size of your PDF files securely, with full control over compression quality.</p>
+            </a>
+        </div>
+
+        <div class="tool-card"><a href="watermark.html">
+            <!-- <h1>💧 📄</h1> -->
+            <h2>PDF Watermark Tool</h2>
+            <p>Add a custom watermark to your PDF files locally and securely without uploading them.</p>
+            </a>
+        </div>
+
+        <div class="tool-card"><a href="home.html">
+            <!-- <h1>📄 ➡️ ✂️📄📄</h1> -->
+            <h2>PDF Split Tool</h2>
+            <p>Split a PDF into separate files, all processed locally for maximum privacy.</p>
+           </a>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Neural Nirvana. All rights reserved. | <a href="privacy-policy.html">Privacy Policy</a></p>
+    </footer>
+
+    <style>
+        /* Styles for layout and design */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffd9b3;
+        }
+        header {
+            background-color: #b7b7d7;
+            color: rgb(67, 67, 67);
+            text-align: center;
+            padding: 20px;
+        }
+        section.tools {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .tool-card {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        width: 90%;
+        max-width: 500px;
+        margin: 10px 0;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+    }
+
+    .emoji-sequence {
+        font-size: 2em;
+        margin-right: 15px;
+    }
+
+    .tool-card h2 {
+        margin: 0 0 5px 0;
+        font-size: 1.3em;
+        color: #333;
+    }
+
+    .tool-card p {
+        margin: 0;
+        font-size: 0.9em;
+        color: #555;
+    }
+
+    /* .btn {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 10px 15px;
+        background-color: #2850a7;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 0.9em;
+    }
+
+    .btn:hover {
+        background-color: #215a88;
+    } */
+
+    /* Mobile Responsive Adjustments */
+    @media screen and (max-width: 768px) {
+        .tool-card {
+            flex-direction: row;
+            padding: 15px;
+        }
+
+        .emoji-sequence {
+            font-size: 2.5em;
+        }
+
+        .tool-card h2 {
+            font-size: 1.2em;
+        }
+
+        .tool-card p {
+            font-size: 0.85em;
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+        .tool-card {
+            flex-direction: row;
+            padding: 10px;
+        }
+
+        .emoji-sequence {
+            font-size: 2.2em;
+        }
+
+        .tool-card h2 {
+            font-size: 1.1em;
+        }
+
+        .tool-card p {
+            font-size: 0.8em;
+        }
+
+        .btn {
+            font-size: 0.85em;
+        }
+    }
+</style>
 </body>
 </html>
