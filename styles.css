@@ -4,10 +4,11 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
+    font-size: 16px; /* Increase base font size */
 }
 
 .container {
-    max-width: 800px;
+    max-width: 100%; /* Ensure full width on mobile */
     margin: 0 auto;
     padding: 20px;
 }
@@ -15,6 +16,7 @@ body {
 h1 {
     text-align: center;
     color: #333;
+    font-size: 24px; /* Increase heading size */
 }
 
 .file-input-wrapper {
@@ -27,11 +29,12 @@ h1 {
 
 .file-input-wrapper label {
     display: inline-block;
-    padding: 10px 15px;
+    padding: 12px 20px; /* Increase padding for better touch targets */
     background-color: #007bff;
     color: white;
     cursor: pointer;
     border-radius: 5px;
+    font-size: 16px; /* Increase font size */
 }
 
 #pdfPreview {
@@ -65,7 +68,8 @@ h1 {
 }
 
 button {
-    padding: 10px;
+    padding: 12px; /* Increase padding for better touch targets */
+    font-size: 16px; /* Increase font size */
     background-color: #007bff;
     color: white;
     border: none;
@@ -104,15 +108,15 @@ button:hover {
 
 @media (max-width: 600px) {
     .container {
-        padding: 10px;
+        padding: 15px; /* Adjust padding for smaller screens */
     }
 
     .controls {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr; /* Single column layout on small screens */
     }
 
     button {
-        padding: 8px;
+        padding: 10px;
         font-size: 14px;
     }
 
@@ -123,5 +127,26 @@ button:hover {
 
     .page-navigation button {
         margin-bottom: 10px;
+    }
+}
+
+.watermark-input-wrapper {
+    margin-bottom: 20px;
+    width: 100%; /* Ensure full width on mobile */
+}
+
+.watermark-input-wrapper input[type="text"] {
+    width: 100%; /* Full width for better visibility */
+    padding: 12px; /* Increase padding for better touch targets */
+    font-size: 18px; /* Increase font size for better readability */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* Ensure padding doesn't affect width */
+}
+
+@media (max-width: 600px) {
+    .watermark-input-wrapper input[type="text"] {
+        font-size: 16px; /* Adjust font size for smaller screens */
+        padding: 10px; /* Adjust padding for smaller screens */
     }
 }

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Watermark Tool</title>
+    <meta name="description" content="Add watermarks to PDF documents locally and securely.">
+    <meta name="author" content="Neural Nirvana">
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Include PDF-Lib library for manipulating PDFs -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+    <!-- GoatCounter script for analytics -->
+    <script data-goatcounter="https://privpdf.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Private PDF Watermark Tool</h1>
+        <p>Add a custom text watermark to your confidential PDF files securely and locally.</p>
+
+        <!-- File input for the PDF file -->
+        <div class="file-input-wrapper">
+            <label for="pdfInput">Choose PDF file</label>
+            <input type="file" id="pdfInput" accept=".pdf">
+            <span id="fileName" style="margin-left: 10px;"></span> <!-- New element for file name -->
+        </div>
+
+        <!-- Input field for watermark text -->
+        <div class="watermark-input-wrapper">
+            <label for="watermarkText">Watermark Text</label>
+            <input type="text" id="watermarkText" placeholder="Enter watermark text">
+        </div>
+
+        <!-- Button to apply the watermark -->
+        <button id="applyWatermark">Apply Watermark</button>
+
+        <!-- Download button for the watermarked PDF -->
+        <button id="downloadPDF" style="display:none;">Download Watermarked PDF</button>
+        
+        <div id="output"></div>
+    </div>
+
+    <script src="watermark.js"></script>
+    <footer>
+        <p>&copy; 2023 Neural Nirvana. All rights reserved.</p>
+        <a href="/index.html">Manipulate Confidential PDFs locally</a>
+
+    </footer>
+</body>
+</html>
