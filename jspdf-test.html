@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jsPDF Loading Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>jsPDF Library Loading Test</h1>
+    
+    <div class="test-container">
+        <h2>Test Multiple CDN Sources</h2>
+        <div id="loading-status">Loading jsPDF from multiple sources...</div>
+        
+        <button onclick="testJSPDF1()" id="test1-btn" disabled>Test Method 1 (window.jspdf.jsPDF)</button>
+        <button onclick="testJSPDF2()" id="test2-btn" disabled>Test Method 2 (window.jsPDF)</button>
+        <button onclick="testJSPDF3()" id="test3-btn" disabled>Test Method 3 (destructuring)</button>
+        
+        <div id="test-results"></div>
+    </div>
+
+    <script>
+        let loadAttempts = 0;
+        const maxAttempts = 4;
+        
+        const jsPDFSources = [
+            'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+            'https://cdn.jsdelivr.net/npm/jspdf@latest/dist/jspdf.umd.min.js',
+            'https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js',
+            'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'
+        ];
+        
+        function updateStatus(message, type = 'info') {
+            document.getElementById('loading-status').innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('test-results');
+            results.innerHTML += `<div class="status ${type}">${message}</div>`;
+        }
+        
+        function enableButtons() {
+            document.getElementById('test1-btn').disabled = false;
+            document.getElementById('test2-btn').disabled = false;
+            document.getElementById('test3-btn').disabled = false;
+        }
+        
+        function loadJSPDF() {
+            if (loadAttempts >= maxAttempts) {
+                updateStatus('All jsPDF sources failed to load', 'error');
+                addResult('❌ All CDN sources failed. Check your internet connection or try a different network.', 'error');
+                return;
+            }
+            
+            const currentSource = jsPDFSources[loadAttempts];
+            updateStatus(`Trying source ${loadAttempts + 1}/${maxAttempts}: ${currentSource}`, 'info');
+            
+            const script = document.createElement('script');
+            script.src = currentSource;
+            
+            script.onload = function() {
+                updateStatus(`✅ jsPDF loaded successfully from: ${currentSource}`, 'success');
+                
+                // Check what's available
+                if (typeof window.jspdf !== 'undefined') {
+                    addResult('✅ window.jspdf is available', 'success');
+                }
+                if (typeof window.jsPDF !== 'undefined') {
+                    addResult('✅ window.jsPDF is available', 'success');
+                }
+                if (typeof window.jspdf !== 'undefined' && typeof window.jspdf.jsPDF !== 'undefined') {
+                    addResult('✅ window.jspdf.jsPDF is available', 'success');
+                }
+                
+                enableButtons();
+            };
+            
+            script.onerror = function() {
+                loadAttempts++;
+                updateStatus(`❌ Source ${loadAttempts} failed, trying next...`, 'error');
+                setTimeout(loadJSPDF, 1000);
+            };
+            
+            document.head.appendChild(script);
+        }
+        
+        function testJSPDF1() {
+            try {
+                if (typeof window.jspdf !== 'undefined' && typeof window.jspdf.jsPDF !== 'undefined') {
+                    const jsPDF = window.jspdf.jsPDF;
+                    const doc = new jsPDF();
+                    doc.text('Hello from Method 1!', 10, 10);
+                    doc.save('test-method1.pdf');
+                    addResult('✅ Method 1 (window.jspdf.jsPDF) works!', 'success');
+                } else {
+                    addResult('❌ Method 1: window.jspdf.jsPDF not available', 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Method 1 error: ${error.message}`, 'error');
+            }
+        }
+        
+        function testJSPDF2() {
+            try {
+                if (typeof window.jsPDF !== 'undefined') {
+                    const doc = new window.jsPDF();
+                    doc.text('Hello from Method 2!', 10, 10);
+                    doc.save('test-method2.pdf');
+                    addResult('✅ Method 2 (window.jsPDF) works!', 'success');
+                } else {
+                    addResult('❌ Method 2: window.jsPDF not available', 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Method 2 error: ${error.message}`, 'error');
+            }
+        }
+        
+        function testJSPDF3() {
+            try {
+                if (typeof window.jspdf !== 'undefined') {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    doc.text('Hello from Method 3!', 10, 10);
+                    doc.save('test-method3.pdf');
+                    addResult('✅ Method 3 (destructuring) works!', 'success');
+                } else {
+                    addResult('❌ Method 3: window.jspdf not available for destructuring', 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Method 3 error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Start loading jsPDF
+        loadJSPDF();
+        
+        // Timeout fallback
+        setTimeout(function() {
+            if (typeof window.jspdf === 'undefined' && typeof window.jsPDF === 'undefined') {
+                updateStatus('Timeout: jsPDF failed to load from all sources', 'error');
+                addResult('🔍 Possible issues: Network restrictions, ad blockers, firewall, or CDN downtime', 'error');
+            }
+        }, 15000);
+    </script>
+</body>
+</html>

@@ -60,10 +60,9 @@
         ], function(success) {
             if (success) {
                 console.log('PDF.js loaded successfully');
-                // Disable workers to avoid CORS issues
+                // Set worker source
                 if (typeof pdfjsLib !== 'undefined') {
-                    pdfjsLib.GlobalWorkerOptions.workerSrc = null;
-                    console.log('PDF.js workers disabled to prevent CORS issues');
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.54/build/pdf.worker.min.js';
                 }
             } else {
                 console.error('Failed to load PDF.js from all sources');
@@ -286,140 +285,6 @@
 
         .tool-icon {
             font-size: 1.2rem;
-        }
-
-        .tool-badge {
-            background: var(--primary-color);
-            color: white;
-            font-size: 0.65rem;
-            padding: 2px 6px;
-            border-radius: 10px;
-            margin-left: auto;
-            font-weight: 600;
-        }
-
-        .wasm-notice {
-            background: rgba(255, 193, 7, 0.1);
-            border: 1px solid rgba(255, 193, 7, 0.3);
-            border-radius: 6px;
-            padding: 8px 12px;
-            margin-top: 10px;
-        }
-
-        .wasm-notice small {
-            color: rgb(133, 77, 14);
-            font-weight: 500;
-        }
-
-        .wasm-status {
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 4px;
-            background: rgba(108, 117, 125, 0.1);
-            color: var(--text-secondary);
-        }
-
-        .wasm-status.loading {
-            background: rgba(255, 193, 7, 0.1);
-            color: rgb(133, 77, 14);
-        }
-
-        .wasm-status.ready {
-            background: rgba(40, 167, 69, 0.1);
-            color: rgb(21, 87, 36);
-        }
-
-        .compression-progress {
-            background: var(--bg-secondary);
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(108, 117, 125, 0.2);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .progress-text {
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .security-notice {
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            border-radius: 6px;
-            padding: 8px 12px;
-            margin-top: 10px;
-        }
-
-        .security-notice small {
-            color: rgb(21, 128, 61);
-            font-weight: 500;
-        }
-
-        .security-status {
-            font-weight: 600;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-        }
-
-        .security-status.high {
-            background: rgba(34, 197, 94, 0.1);
-            color: rgb(21, 128, 61);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-        }
-
-        .security-status.medium {
-            background: rgba(255, 193, 7, 0.1);
-            color: rgb(133, 77, 14);
-            border: 1px solid rgba(255, 193, 7, 0.3);
-        }
-
-        .security-status.low {
-            background: rgba(239, 68, 68, 0.1);
-            color: rgb(153, 27, 27);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .permissions-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 8px;
-        }
-
-        .permission-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-
-        .permission-item input[type="checkbox"] {
-            margin: 0;
-        }
-
-        .protection-progress {
-            background: var(--bg-secondary);
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
         }
 
         .workspace {
@@ -1114,16 +979,14 @@
                     <button class="tool-btn" data-tool="compress">
                         <span class="tool-icon">🗜️</span>
                         <span>Compress PDF</span>
-                        <span class="tool-badge">WASM</span>
-                    </button>
-                    <button class="tool-btn" data-tool="protect">
-                        <span class="tool-icon">🔐</span>
-                        <span>Protect PDF</span>
-                        <span class="tool-badge">AES-256</span>
                     </button>
                     <button class="tool-btn" data-tool="watermark">
                         <span class="tool-icon">💧</span>
                         <span>Add Watermark</span>
+                    </button>
+                    <button class="tool-btn" data-tool="protect">
+                        <span class="tool-icon">🔐</span>
+                        <span>Protect PDF</span>
                     </button>
                 </div>
 
@@ -1389,129 +1252,38 @@
                 <!-- Compress PDF Tool -->
                 <div class="tool-panel" id="compress-panel">
                     <div class="tool-header">
-                        <h2>Compress PDF <span class="tool-badge">WASM Powered</span></h2>
-                        <p>High-quality compression using Ghostscript WebAssembly</p>
-                        <div class="wasm-notice">
-                            <small>⚡ First use downloads 16MB Ghostscript WASM from jsDelivr CDN</small>
-                        </div>
+                        <h2>Compress PDF</h2>
+                        <p>Reduce file size while maintaining quality</p>
                     </div>
                     
                     <div class="drop-zone" id="compress-dropzone">
                         <div class="drop-zone-icon">🗜️</div>
                         <div class="drop-zone-text">Drop a PDF file here or click to browse</div>
-                        <div class="drop-zone-subtext">Professional compression with Ghostscript</div>
+                        <div class="drop-zone-subtext">Choose compression level after loading</div>
                         <input type="file" class="file-input" id="compress-input" accept=".pdf">
                     </div>
 
                     <div class="settings-grid" id="compress-settings" style="display: none;">
                         <div class="setting-item">
-                            <label class="setting-label">Compression Level</label>
-                            <select class="setting-input" id="compress-quality">
-                                <option value="screen">Screen (72 DPI) - Smallest</option>
-                                <option value="ebook" selected>eBook (150 DPI) - Balanced</option>
-                                <option value="printer">Printer (300 DPI) - Good Quality</option>
-                                <option value="prepress">Prepress (300+ DPI) - High Quality</option>
-                            </select>
+                            <label class="setting-label">Compression Quality</label>
+                            <div class="range-container">
+                                <input type="range" class="range-input" id="compress-quality" min="1" max="10" value="7">
+                                <span class="range-value" id="compress-quality-value">7</span>
+                            </div>
                         </div>
                         <div class="setting-item">
                             <label class="setting-label">Original Size</label>
                             <div class="file-size" id="compress-original-size">-</div>
                         </div>
                         <div class="setting-item">
-                            <label class="setting-label">WASM Status</label>
-                            <div class="wasm-status" id="wasm-status">Not loaded</div>
+                            <label class="setting-label">Estimated Size</label>
+                            <div class="file-size" id="compress-estimated-size">-</div>
                         </div>
-                    </div>
-
-                    <div class="compression-progress" id="compression-progress" style="display: none;">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progress-fill"></div>
-                        </div>
-                        <div class="progress-text" id="progress-text">Initializing...</div>
                     </div>
 
                     <div class="action-buttons">
                         <button class="btn btn-primary" id="compress-button" style="display: none;">
-                            <span>Compress with Ghostscript</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Protect PDF Tool -->
-                <div class="tool-panel" id="protect-panel">
-                    <div class="tool-header">
-                        <h2>Protect PDF <span class="tool-badge">AES-256</span></h2>
-                        <p>Add password protection and encryption to your PDF</p>
-                        <div class="security-notice">
-                            <small>🔐 Uses Web Crypto API for AES-256-GCM encryption</small>
-                        </div>
-                    </div>
-                    
-                    <div class="drop-zone" id="protect-dropzone">
-                        <div class="drop-zone-icon">🔐</div>
-                        <div class="drop-zone-text">Drop a PDF file here or click to browse</div>
-                        <div class="drop-zone-subtext">Encrypt with professional-grade security</div>
-                        <input type="file" class="file-input" id="protect-input" accept=".pdf">
-                    </div>
-
-                    <div class="settings-grid" id="protect-settings" style="display: none;">
-                        <div class="setting-item">
-                            <label class="setting-label">Protection Method</label>
-                            <select class="setting-input" id="protect-method">
-                                <option value="auto">Auto (Best Available)</option>
-                                <option value="encryption">AES-256 Encryption (Recommended)</option>
-                                <option value="watermark">Watermark Protection</option>
-                                <option value="metadata">Metadata Protection</option>
-                            </select>
-                        </div>
-                        <div class="setting-item">
-                            <label class="setting-label">User Password (to open)</label>
-                            <input type="password" class="setting-input" id="protect-user-password" placeholder="Leave empty for no password">
-                        </div>
-                        <div class="setting-item">
-                            <label class="setting-label">Owner Password (advanced)</label>
-                            <input type="password" class="setting-input" id="protect-owner-password" placeholder="For permission control">
-                        </div>
-                        <div class="setting-item">
-                            <label class="setting-label">Document Permissions</label>
-                            <div class="permissions-grid">
-                                <label class="permission-item">
-                                    <input type="checkbox" id="protect-print" checked>
-                                    <span>Allow Printing</span>
-                                </label>
-                                <label class="permission-item">
-                                    <input type="checkbox" id="protect-copy" checked>
-                                    <span>Allow Copying Text</span>
-                                </label>
-                                <label class="permission-item">
-                                    <input type="checkbox" id="protect-modify" checked>
-                                    <span>Allow Modifications</span>
-                                </label>
-                                <label class="permission-item">
-                                    <input type="checkbox" id="protect-annotate" checked>
-                                    <span>Allow Annotations</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="setting-item">
-                            <label class="setting-label">Security Status</label>
-                            <div class="security-status" id="security-status">Checking capabilities...</div>
-                        </div>
-                    </div>
-
-                    <div class="protection-progress" id="protection-progress" style="display: none;">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="protect-progress-fill"></div>
-                        </div>
-                        <div class="progress-text" id="protect-progress-text">Initializing...</div>
-                    </div>
-
-                    <div class="action-buttons">
-                        <button class="btn btn-primary" id="protect-button" style="display: none;">
-                            <span>Protect PDF</span>
-                        </button>
-                        <button class="btn btn-secondary" id="decrypt-button" style="display: none;">
-                            <span>Decrypt PDF</span>
+                            <span>Compress PDF</span>
                         </button>
                     </div>
                 </div>
@@ -1591,6 +1363,46 @@
                     </div>
                 </div>
 
+                <!-- Protect PDF Tool -->
+                <div class="tool-panel" id="protect-panel">
+                    <div class="tool-header">
+                        <h2>Protect PDF</h2>
+                        <p>Add password protection and set permissions</p>
+                    </div>
+                    
+                    <div class="drop-zone" id="protect-dropzone">
+                        <div class="drop-zone-icon">🔐</div>
+                        <div class="drop-zone-text">Drop a PDF file here or click to browse</div>
+                        <div class="drop-zone-subtext">Set protection options after loading</div>
+                        <input type="file" class="file-input" id="protect-input" accept=".pdf">
+                    </div>
+
+                    <div class="settings-grid" id="protect-settings" style="display: none;">
+                        <div class="setting-item">
+                            <label class="setting-label">User Password (to open)</label>
+                            <input type="password" class="setting-input" id="protect-user-password" placeholder="Leave empty for no password">
+                        </div>
+                        <div class="setting-item">
+                            <label class="setting-label">Owner Password (to edit)</label>
+                            <input type="password" class="setting-input" id="protect-owner-password" placeholder="Required for permissions">
+                        </div>
+                        <div class="setting-item">
+                            <label class="setting-label">Permissions</label>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label><input type="checkbox" id="protect-print" checked> Allow Printing</label>
+                                <label><input type="checkbox" id="protect-copy" checked> Allow Copying</label>
+                                <label><input type="checkbox" id="protect-modify" checked> Allow Modification</label>
+                                <label><input type="checkbox" id="protect-annotate" checked> Allow Annotations</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="protect-button" style="display: none;">
+                            <span>Protect PDF</span>
+                        </button>
+                    </div>
+                </div>
 
                 <!-- Image to PDF Tool -->
                 <div class="tool-panel" id="imagetopdf-panel">
@@ -1761,70 +1573,14 @@
                 // All libraries loaded successfully, initialize PrivPDF
                 console.log('All libraries loaded successfully');
                 
-                // Load helper scripts first
-                const wasmScript = document.createElement('script');
-                wasmScript.src = 'ghostscript-wasm.js';
-                wasmScript.onload = function() {
-                    console.log('Ghostscript WASM module loaded');
-                    
-                    const protectionScript = document.createElement('script');
-                    protectionScript.src = 'pdf-protection.js';
-                    protectionScript.onload = function() {
-                        console.log('PDF Protection module loaded');
-                        
-                        const compressScript = document.createElement('script');
-                        compressScript.src = 'compress-simple.js';
-                        compressScript.onload = function() {
-                            // Load main script after all helpers are loaded
-                            const mainScript = document.createElement('script');
-                            mainScript.src = 'privpdf.js';
-                            mainScript.onerror = function() {
-                                console.error('Failed to load privpdf.js');
-                                document.body.innerHTML = '<div style="text-align:center;margin-top:100px;color:white;"><h2>Error: Main script failed to load</h2><p>Please check that privpdf.js exists and refresh the page.</p></div>';
-                            };
-                            document.head.appendChild(mainScript);
-                        };
-                        compressScript.onerror = function() {
-                            console.warn('Compression helper failed to load, using WASM compression only');
-                            // Load main script anyway
-                            const mainScript = document.createElement('script');
-                            mainScript.src = 'privpdf.js';
-                            document.head.appendChild(mainScript);
-                        };
-                        document.head.appendChild(compressScript);
-                    };
-                    protectionScript.onerror = function() {
-                        console.warn('PDF Protection failed to load, using basic protection');
-                        // Continue with compression script
-                        const compressScript = document.createElement('script');
-                        compressScript.src = 'compress-simple.js';
-                        compressScript.onload = function() {
-                            const mainScript = document.createElement('script');
-                            mainScript.src = 'privpdf.js';
-                            document.head.appendChild(mainScript);
-                        };
-                        document.head.appendChild(compressScript);
-                    };
-                    document.head.appendChild(protectionScript);
+                // Load and execute the main script
+                const script = document.createElement('script');
+                script.src = 'privpdf.js';
+                script.onerror = function() {
+                    console.error('Failed to load privpdf.js');
+                    document.body.innerHTML = '<div style="text-align:center;margin-top:100px;color:white;"><h2>Error: Main script failed to load</h2><p>Please check that privpdf.js exists and refresh the page.</p><p>You can try the simple version: <a href="privpdf-simple.html" style="color:#6366f1;">privpdf-simple.html</a></p></div>';
                 };
-                wasmScript.onerror = function() {
-                    console.warn('Ghostscript WASM failed to load, using basic compression');
-                    // Fallback to old compression method
-                    const protectionScript = document.createElement('script');
-                    protectionScript.src = 'pdf-protection.js';
-                    protectionScript.onload = function() {
-                        const compressScript = document.createElement('script');
-                        compressScript.src = 'compress-simple.js';
-                        compressScript.onload = function() {
-                            const mainScript = document.createElement('script');
-                            mainScript.src = 'privpdf.js';
-                            document.head.appendChild(mainScript);
-                        };
-                        document.head.appendChild(compressScript);
-                    };
-                    document.head.appendChild(protectionScript);
-                };
-                document.head.appendChild(wasmScript);
+                document.head.appendChild(script);
             }, 500);
         });
         
@@ -1836,90 +1592,5 @@
             }
         }, 10000);
     </script>
-
-    <!-- SEO Content Section -->
-    <section style="display: none;" aria-hidden="true">
-        <h2>PrivPDF - Complete PDF Toolkit for Secure Document Processing</h2>
-        
-        <h3>Free Online PDF Tools - 100% Client-Side Processing</h3>
-        <p>PrivPDF is a comprehensive PDF toolkit that processes all your documents locally in your browser. No files are uploaded to servers, ensuring complete privacy and security for your sensitive documents.</p>
-        
-        <h3>PDF Editing and Manipulation Tools</h3>
-        <ul>
-            <li><strong>Merge PDF Files</strong> - Combine multiple PDF documents into a single file with drag-and-drop simplicity</li>
-            <li><strong>Split PDF Pages</strong> - Extract specific pages or split large PDFs into smaller documents</li>
-            <li><strong>PDF Compression</strong> - Reduce file size using advanced Ghostscript WASM compression technology</li>
-            <li><strong>Rotate PDF Pages</strong> - Fix orientation issues by rotating pages 90, 180, or 270 degrees</li>
-            <li><strong>Delete PDF Pages</strong> - Remove unwanted pages from your documents quickly and easily</li>
-            <li><strong>Reorder PDF Pages</strong> - Reorganize page sequence with intuitive drag-and-drop interface</li>
-        </ul>
-        
-        <h3>PDF Security and Protection Features</h3>
-        <ul>
-            <li><strong>Password Protection</strong> - Add AES-256 encryption with user and owner passwords</li>
-            <li><strong>Watermark PDFs</strong> - Add text or image watermarks to protect document authenticity</li>
-            <li><strong>Remove Metadata</strong> - Clean sensitive information from PDF properties</li>
-            <li><strong>Permission Controls</strong> - Restrict printing, copying, editing, and annotation permissions</li>
-        </ul>
-        
-        <h3>PDF Conversion and Creation Tools</h3>
-        <ul>
-            <li><strong>Images to PDF</strong> - Convert JPG, PNG, GIF, BMP, and WebP images to PDF format</li>
-            <li><strong>Create PDF from Scratch</strong> - Build new PDF documents with text, images, and formatting</li>
-            <li><strong>PDF to Images</strong> - Extract pages as high-quality image files</li>
-            <li><strong>Text Extraction</strong> - Extract and copy text content from PDF documents</li>
-        </ul>
-        
-        <h3>Why Choose PrivPDF?</h3>
-        <h4>Complete Privacy and Security</h4>
-        <p>Unlike other online PDF tools, PrivPDF processes everything in your browser using WebAssembly and JavaScript. Your files never leave your device, making it perfect for sensitive business documents, legal papers, financial records, and personal files.</p>
-        
-        <h4>Professional-Grade Features</h4>
-        <p>Our toolkit includes enterprise-level capabilities like real Ghostscript compression, AES-256 encryption, and advanced PDF manipulation using industry-standard libraries like PDF-lib and PDF.js.</p>
-        
-        <h4>No File Size Limits</h4>
-        <p>Process large PDF files without restrictions. Our client-side approach means you're only limited by your device's memory, not artificial server limits.</p>
-        
-        <h4>Works Offline</h4>
-        <p>Once loaded, PrivPDF works without an internet connection. Perfect for secure environments or when working with confidential documents.</p>
-        
-        <h3>Advanced PDF Processing Technologies</h3>
-        <p>PrivPDF leverages cutting-edge web technologies:</p>
-        <ul>
-            <li><strong>WebAssembly (WASM)</strong> - Near-native performance for complex PDF operations</li>
-            <li><strong>Ghostscript WASM</strong> - Professional PDF compression and optimization</li>
-            <li><strong>PDF.js</strong> - Mozilla's robust PDF rendering and parsing engine</li>
-            <li><strong>PDF-lib</strong> - Modern JavaScript PDF generation and modification</li>
-            <li><strong>Web Crypto API</strong> - Hardware-accelerated encryption for maximum security</li>
-        </ul>
-        
-        <h3>Common PDF Tasks Made Simple</h3>
-        <h4>Business Document Management</h4>
-        <p>Merge contracts, split reports, compress presentations, and protect confidential documents. PrivPDF handles all your business PDF needs while maintaining strict privacy standards.</p>
-        
-        <h4>Academic and Research Use</h4>
-        <p>Combine research papers, extract specific chapters, compress large documents for email, and protect thesis documents with password encryption.</p>
-        
-        <h4>Personal Document Organization</h4>
-        <p>Organize family photos into PDF albums, split large documents, remove sensitive metadata from personal files, and create secure archives.</p>
-        
-        <h3>Browser Compatibility</h3>
-        <p>PrivPDF works on all modern browsers including Chrome, Firefox, Safari, and Edge. Optimized for both desktop and mobile devices with responsive design.</p>
-        
-        <h3>Keywords and Search Terms</h3>
-        <p>PDF editor, merge PDF online, split PDF, compress PDF, PDF tools, secure PDF, password protect PDF, watermark PDF, PDF converter, images to PDF, free PDF tools, PDF manipulation, client-side PDF processing, private PDF editor, offline PDF tools, PDF security, PDF compression, PDF merger, PDF splitter, PDF password protection, PDF watermark, remove PDF password, PDF metadata remover, PDF page organizer, rotate PDF pages, delete PDF pages, PDF to images, extract PDF text, create PDF, edit PDF online, PDF toolkit, browser PDF editor, WebAssembly PDF, JavaScript PDF tools, PDF.js, PDF-lib</p>
-        
-        <h3>Alternative Search Queries</h3>
-        <p>How to merge PDF files, how to split PDF pages, how to compress PDF size, how to password protect PDF, how to add watermark to PDF, how to remove PDF password, how to convert images to PDF, how to rotate PDF pages, how to delete pages from PDF, how to extract text from PDF, best free PDF tools, secure PDF editor online, private PDF processing, offline PDF tools, client-side PDF editor</p>
-        
-        <h3>Technical Specifications</h3>
-        <p>Supports PDF versions 1.0 through 2.0, handles files up to system memory limits, uses AES-256 encryption, supports RC4 and AES security handlers, processes multiple image formats (JPEG, PNG, GIF, BMP, WebP), maintains document structure and metadata, preserves fonts and embedded objects, supports all PDF page orientations and sizes.</p>
-        
-        <h3>Privacy Statement</h3>
-        <p>PrivPDF is committed to user privacy. We use client-side processing exclusively, meaning your documents are never uploaded to our servers or any third-party services. All processing happens locally in your browser, and no data is transmitted or stored externally. This makes PrivPDF the most secure option for processing sensitive documents.</p>
-        
-        <h3>Free and Open Source</h3>
-        <p>PrivPDF is completely free to use with no registration required, no watermarks added, and no restrictions on usage. Built using open-source technologies and libraries to ensure transparency and reliability.</p>
-    </section>
 </body>
 </html>

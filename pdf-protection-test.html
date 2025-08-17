@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Protection & Encryption Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .security-level {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .security-level.high {
+            background: #22c55e;
+            color: white;
+        }
+        .security-level.medium {
+            background: #f59e0b;
+            color: white;
+        }
+        .security-level.low {
+            background: #ef4444;
+            color: white;
+        }
+        .upload-area {
+            border: 3px dashed #3b82f6;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(45deg, #f8fafc, #f1f5f9);
+        }
+        .upload-area:hover {
+            border-color: #1d4ed8;
+            background: linear-gradient(45deg, #dbeafe, #bfdbfe);
+        }
+        .upload-area.dragover {
+            border-color: #059669;
+            background: linear-gradient(45deg, #d1fae5, #a7f3d0);
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .protection-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .method-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .method-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .method-card.selected {
+            border-color: #059669;
+            background: linear-gradient(45deg, #f0fdf4, #ecfdf5);
+        }
+        .method-card.unavailable {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .controls {
+            margin: 30px 0;
+            padding: 25px;
+            background: linear-gradient(45deg, #f8fafc, #f1f5f9);
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        .control-group {
+            margin: 15px 0;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 15px;
+            align-items: center;
+        }
+        .btn {
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 8px;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        }
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .btn.danger {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+        }
+        .btn.danger:hover {
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+        }
+        .results {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 12px;
+            display: none;
+        }
+        .results.success {
+            background: linear-gradient(45deg, #f0fdf4, #ecfdf5);
+            border: 2px solid #22c55e;
+            color: #15803d;
+        }
+        .results.error {
+            background: linear-gradient(45deg, #fef2f2, #fee2e2);
+            border: 2px solid #ef4444;
+            color: #dc2626;
+        }
+        .results.warning {
+            background: linear-gradient(45deg, #fffbeb, #fef3c7);
+            border: 2px solid #f59e0b;
+            color: #d97706;
+        }
+        .progress {
+            width: 100%;
+            height: 25px;
+            background: #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+            width: 0%;
+            transition: width 0.3s ease;
+            background-size: 200% 200%;
+            animation: progressShine 2s linear infinite;
+        }
+        @keyframes progressShine {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .progress-text {
+            text-align: center;
+            margin: 10px 0;
+            color: #4b5563;
+            font-weight: 500;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: linear-gradient(45deg, #f8fafc, #f1f5f9);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+        .encryption-info {
+            background: linear-gradient(45deg, #dbeafe, #bfdbfe);
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 PDF Protection & AES-256 Encryption Test</h1>
+            <p>Test real client-side PDF encryption and protection capabilities</p>
+            <div id="systemCapabilities"></div>
+        </div>
+        
+        <div class="upload-area" id="uploadArea">
+            <h3>📄 Drop PDF file here or click to browse</h3>
+            <p>Test encryption, decryption, and protection methods</p>
+            <input type="file" id="fileInput" accept=".pdf">
+        </div>
+        
+        <div class="protection-methods" id="protectionMethods" style="display: none;">
+            <div class="method-card" data-method="encryption">
+                <h4>🔒 AES-256 Encryption</h4>
+                <p>Professional-grade encryption using Web Crypto API</p>
+                <div class="security-level high">HIGH SECURITY</div>
+            </div>
+            <div class="method-card" data-method="watermark">
+                <h4>💧 Watermark Protection</h4>
+                <p>Visual protection with watermarks and metadata</p>
+                <div class="security-level medium">MEDIUM SECURITY</div>
+            </div>
+            <div class="method-card" data-method="metadata">
+                <h4>📋 Metadata Protection</h4>
+                <p>Obfuscation and metadata-based protection</p>
+                <div class="security-level low">LOW SECURITY</div>
+            </div>
+        </div>
+        
+        <div class="controls" id="controls" style="display: none;">
+            <h3>Protection Settings</h3>
+            
+            <div class="control-group">
+                <label><strong>User Password:</strong></label>
+                <input type="password" id="userPassword" placeholder="Password to open PDF" style="padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;">
+            </div>
+            
+            <div class="control-group">
+                <label><strong>Owner Password:</strong></label>
+                <input type="password" id="ownerPassword" placeholder="Administrative password" style="padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;">
+            </div>
+            
+            <div class="control-group">
+                <label><strong>Permissions:</strong></label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <label><input type="checkbox" id="allowPrint" checked> Printing</label>
+                    <label><input type="checkbox" id="allowCopy" checked> Text Copying</label>
+                    <label><input type="checkbox" id="allowModify" checked> Modifications</label>
+                    <label><input type="checkbox" id="allowAnnotate" checked> Annotations</label>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 25px;">
+                <button class="btn" id="protectBtn">🔐 Protect PDF</button>
+                <button class="btn danger" id="decryptBtn" style="display: none;">🔓 Decrypt PDF</button>
+                <button class="btn" id="testEncryptionBtn">🧪 Test Encryption Speed</button>
+            </div>
+        </div>
+        
+        <div id="progressContainer" style="display: none;">
+            <div class="progress">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="progress-text" id="progressText">Ready</div>
+        </div>
+        
+        <div class="stats" id="stats" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-value" id="originalSize">-</div>
+                <div class="stat-label">Original Size</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="protectedSize">-</div>
+                <div class="stat-label">Protected Size</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="processingTime">-</div>
+                <div class="stat-label">Processing Time</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="encryptionMethod">-</div>
+                <div class="stat-label">Method Used</div>
+            </div>
+        </div>
+        
+        <div class="results" id="results"></div>
+        
+        <div class="encryption-info">
+            <h4>🔬 Encryption Technical Details</h4>
+            <ul>
+                <li><strong>Algorithm:</strong> AES-256-GCM (Galois/Counter Mode)</li>
+                <li><strong>Key Derivation:</strong> PBKDF2 with 100,000 iterations</li>
+                <li><strong>Salt:</strong> 16-byte random salt per encryption</li>
+                <li><strong>IV:</strong> 12-byte random initialization vector</li>
+                <li><strong>Browser Support:</strong> Modern browsers with Web Crypto API</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="pdf-protection.js"></script>
+    <script>
+        let selectedFile = null;
+        let selectedMethod = 'encryption';
+        let pdfProtection = null;
+        let startTime = 0;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            pdfProtection = new PDFProtection();
+            updateSystemCapabilities();
+            setupEventListeners();
+        });
+
+        function updateSystemCapabilities() {
+            const capabilities = pdfProtection.getAvailableMethods();
+            const container = document.getElementById('systemCapabilities');
+            
+            let html = '<div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">';
+            
+            capabilities.methods.forEach(method => {
+                const statusClass = method.available ? (method.security === 'High' ? 'high' : method.security === 'Medium' ? 'medium' : 'low') : 'low';
+                const status = method.available ? '✅ Available' : '❌ Unavailable';
+                html += `<div class="security-level ${statusClass}">${method.name}: ${status}</div>`;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+
+            // Update method cards availability
+            document.querySelectorAll('.method-card').forEach(card => {
+                const method = card.dataset.method;
+                const methodInfo = capabilities.methods.find(m => m.id === method);
+                if (!methodInfo || !methodInfo.available) {
+                    card.classList.add('unavailable');
+                }
+            });
+        }
+
+        function setupEventListeners() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            
+            uploadArea.addEventListener('click', () => fileInput.click());
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files[0]) handleFile(files[0]);
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files[0]) handleFile(e.target.files[0]);
+            });
+
+            // Method selection
+            document.querySelectorAll('.method-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    if (card.classList.contains('unavailable')) return;
+                    
+                    document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    selectedMethod = card.dataset.method;
+                });
+            });
+
+            // Action buttons
+            document.getElementById('protectBtn').addEventListener('click', protectFile);
+            document.getElementById('decryptBtn').addEventListener('click', decryptFile);
+            document.getElementById('testEncryptionBtn').addEventListener('click', testEncryptionSpeed);
+        }
+
+        async function handleFile(file) {
+            if (file.type !== 'application/pdf') {
+                showResults('Please select a valid PDF file', 'error');
+                return;
+            }
+            
+            selectedFile = file;
+            
+            // Check if encrypted
+            const arrayBuffer = await file.arrayBuffer();
+            const isEncrypted = pdfProtection.isEncryptedPDF(new Uint8Array(arrayBuffer));
+            
+            document.getElementById('protectionMethods').style.display = 'grid';
+            document.getElementById('controls').style.display = 'block';
+            document.getElementById('stats').style.display = 'grid';
+            
+            // Update UI based on encryption status
+            const protectBtn = document.getElementById('protectBtn');
+            const decryptBtn = document.getElementById('decryptBtn');
+            
+            if (isEncrypted) {
+                protectBtn.style.display = 'none';
+                decryptBtn.style.display = 'inline-block';
+                showResults('🔐 Encrypted PDF detected. Click "Decrypt PDF" to unlock.', 'warning');
+            } else {
+                protectBtn.style.display = 'inline-block';
+                decryptBtn.style.display = 'none';
+                showResults('📄 PDF loaded successfully. Choose protection method and settings.', 'success');
+            }
+            
+            // Update stats
+            document.getElementById('originalSize').textContent = formatFileSize(file.size);
+            hideResults();
+        }
+
+        async function protectFile() {
+            if (!selectedFile) return;
+            
+            startTime = Date.now();
+            
+            try {
+                showProgress('Initializing protection...', 0);
+                
+                const userPassword = document.getElementById('userPassword').value;
+                const ownerPassword = document.getElementById('ownerPassword').value;
+                
+                if (selectedMethod === 'encryption' && !userPassword && !ownerPassword) {
+                    showResults('Password required for encryption method', 'error');
+                    hideProgress();
+                    return;
+                }
+                
+                const permissions = {
+                    print: document.getElementById('allowPrint').checked,
+                    copy: document.getElementById('allowCopy').checked,
+                    modify: document.getElementById('allowModify').checked,
+                    annotate: document.getElementById('allowAnnotate').checked
+                };
+                
+                showProgress('Reading PDF file...', 20);
+                const arrayBuffer = await selectedFile.arrayBuffer();
+                
+                showProgress('Applying protection...', 40);
+                const result = await pdfProtection.protectPDF(arrayBuffer, {
+                    method: selectedMethod,
+                    userPassword,
+                    ownerPassword,
+                    permissions
+                });
+                
+                showProgress('Finalizing...', 90);
+                
+                if (result.success) {
+                    // Download protected file
+                    downloadPDF(result.data, 'protected.pdf');
+                    
+                    // Update stats
+                    const processingTime = Date.now() - startTime;
+                    document.getElementById('protectedSize').textContent = formatFileSize(result.protectedSize || result.data.byteLength);
+                    document.getElementById('processingTime').textContent = `${processingTime}ms`;
+                    document.getElementById('encryptionMethod').textContent = result.method.split(' ')[0];
+                    
+                    showProgress('Complete!', 100);
+                    
+                    setTimeout(() => {
+                        hideProgress();
+                        showResults(`
+                            <h3>✅ PDF Protection Applied Successfully!</h3>
+                            <p><strong>Method:</strong> ${result.method}</p>
+                            <p><strong>Encryption:</strong> ${result.isEncrypted ? 'Yes (AES-256-GCM)' : 'No'}</p>
+                            <p><strong>Password Protected:</strong> ${result.requiresPassword ? 'Yes' : 'No'}</p>
+                            <p><strong>Processing Time:</strong> ${processingTime}ms</p>
+                            <p><strong>File Size:</strong> ${formatFileSize(selectedFile.size)} → ${formatFileSize(result.protectedSize || result.data.byteLength)}</p>
+                            ${result.note ? `<p><em>Note: ${result.note}</em></p>` : ''}
+                        `, 'success');
+                    }, 1000);
+                } else {
+                    throw new Error('Protection failed');
+                }
+                
+            } catch (error) {
+                hideProgress();
+                showResults(`❌ Protection failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function decryptFile() {
+            if (!selectedFile) return;
+            
+            const password = prompt('Enter password to decrypt PDF:');
+            if (!password) return;
+            
+            try {
+                showProgress('Decrypting PDF...', 50);
+                
+                const arrayBuffer = await selectedFile.arrayBuffer();
+                const result = await pdfProtection.decryptPDF(new Uint8Array(arrayBuffer), password);
+                
+                if (result.success) {
+                    downloadPDF(result.data, 'decrypted.pdf');
+                    showResults('✅ PDF decrypted successfully!', 'success');
+                } else {
+                    throw new Error('Decryption failed');
+                }
+                
+            } catch (error) {
+                showResults(`❌ Decryption failed: ${error.message}`, 'error');
+            } finally {
+                hideProgress();
+            }
+        }
+
+        async function testEncryptionSpeed() {
+            if (!selectedFile) return;
+            
+            try {
+                showProgress('Testing encryption speed...', 0);
+                
+                const arrayBuffer = await selectedFile.arrayBuffer();
+                const testSizes = [
+                    { size: Math.min(100000, arrayBuffer.byteLength), name: '100KB' },
+                    { size: Math.min(500000, arrayBuffer.byteLength), name: '500KB' },
+                    { size: arrayBuffer.byteLength, name: 'Full File' }
+                ];
+                
+                let results = '<h3>🧪 Encryption Speed Test Results</h3>';
+                
+                for (let i = 0; i < testSizes.length; i++) {
+                    const test = testSizes[i];
+                    showProgress(`Testing ${test.name}...`, (i + 1) * 30);
+                    
+                    const testData = arrayBuffer.slice(0, test.size);
+                    const startTime = performance.now();
+                    
+                    await pdfProtection.protectPDF(testData, {
+                        method: 'encryption',
+                        userPassword: 'test123'
+                    });
+                    
+                    const endTime = performance.now();
+                    const speed = (test.size / 1024 / 1024) / ((endTime - startTime) / 1000);
+                    
+                    results += `<p><strong>${test.name} (${formatFileSize(test.size)}):</strong> ${(endTime - startTime).toFixed(0)}ms (${speed.toFixed(2)} MB/s)</p>`;
+                }
+                
+                hideProgress();
+                showResults(results, 'success');
+                
+            } catch (error) {
+                hideProgress();
+                showResults(`❌ Speed test failed: ${error.message}`, 'error');
+            }
+        }
+
+        function showProgress(text, percentage) {
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('progressText').textContent = text;
+            document.getElementById('progressBar').style.width = `${percentage}%`;
+        }
+
+        function hideProgress() {
+            document.getElementById('progressContainer').style.display = 'none';
+        }
+
+        function downloadPDF(bytes, filename) {
+            const blob = new Blob([bytes], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        function showResults(message, type) {
+            const results = document.getElementById('results');
+            results.innerHTML = message;
+            results.className = `results ${type}`;
+            results.style.display = 'block';
+        }
+
+        function hideResults() {
+            document.getElementById('results').style.display = 'none';
+        }
+
+        // Initialize with encryption method selected
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                document.querySelector('[data-method="encryption"]').click();
+            }, 100);
+        });
+    </script>
+</body>
+</html>

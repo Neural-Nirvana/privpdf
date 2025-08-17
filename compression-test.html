@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Compression Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .upload-area {
+            border: 2px dashed #007bff;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-area:hover {
+            background: #f8f9fa;
+            border-color: #0056b3;
+        }
+        .upload-area.dragover {
+            background: #e3f2fd;
+            border-color: #1976d2;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .quality-control {
+            margin: 15px 0;
+        }
+        .quality-slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+        .quality-value {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .results {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        .results.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .results.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .file-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .info-item {
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #007bff;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #495057;
+        }
+        .info-value {
+            font-size: 1.2em;
+            color: #212529;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PDF Compression Test</h1>
+        <p>Test PDF compression without PDF.js workers</p>
+        
+        <div class="upload-area" id="uploadArea">
+            <h3>📄 Drop PDF file here or click to browse</h3>
+            <p>Only PDF files are supported</p>
+            <input type="file" id="fileInput" accept=".pdf">
+        </div>
+        
+        <div class="controls" id="controls" style="display: none;">
+            <div class="quality-control">
+                <label for="qualitySlider">Compression Quality:</label>
+                <input type="range" id="qualitySlider" class="quality-slider" min="1" max="10" value="7">
+                <div class="quality-value" id="qualityValue">7 (Good - Recommended)</div>
+            </div>
+            
+            <div class="file-info" id="fileInfo"></div>
+            
+            <button class="btn" id="compressBtn" onclick="compressFile()">Compress PDF</button>
+            <button class="btn" id="resetBtn" onclick="resetTest()">Reset</button>
+        </div>
+        
+        <div class="results" id="results"></div>
+    </div>
+
+    <!-- Load libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.16.0/dist/pdf-lib.min.js"></script>
+    <script src="compress-simple.js"></script>
+    
+    <script>
+        // Disable PDF.js workers globally if PDF.js gets loaded
+        if (typeof pdfjsLib !== 'undefined' && pdfjsLib.GlobalWorkerOptions) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = null;
+            console.log('PDF.js workers disabled in compression test');
+        }
+    </script>
+
+    <script>
+        let selectedFile = null;
+
+        // Set up drag and drop
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const controls = document.getElementById('controls');
+        const qualitySlider = document.getElementById('qualitySlider');
+        const qualityValue = document.getElementById('qualityValue');
+        const results = document.getElementById('results');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files[0]) handleFile(files[0]);
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) handleFile(e.target.files[0]);
+        });
+
+        qualitySlider.addEventListener('input', updateQualityDisplay);
+
+        function updateQualityDisplay() {
+            const quality = parseInt(qualitySlider.value);
+            let desc = '';
+            if (quality <= 3) desc = ' (Low - Smallest file)';
+            else if (quality <= 5) desc = ' (Medium - Balanced)';
+            else if (quality <= 7) desc = ' (Good - Recommended)';
+            else desc = ' (High - Best quality)';
+            
+            qualityValue.textContent = quality + desc;
+            
+            if (selectedFile) {
+                updateEstimate();
+            }
+        }
+
+        function handleFile(file) {
+            if (file.type !== 'application/pdf') {
+                showResults('Please select a valid PDF file', 'error');
+                return;
+            }
+            
+            selectedFile = file;
+            controls.style.display = 'block';
+            
+            const fileInfo = document.getElementById('fileInfo');
+            fileInfo.innerHTML = `
+                <div class="info-item">
+                    <div class="info-label">File Name:</div>
+                    <div class="info-value">${file.name}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Original Size:</div>
+                    <div class="info-value">${formatFileSize(file.size)}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Estimated Size:</div>
+                    <div class="info-value" id="estimatedSize">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Expected Reduction:</div>
+                    <div class="info-value" id="expectedReduction">-</div>
+                </div>
+            `;
+            
+            updateEstimate();
+            hideResults();
+        }
+
+        function updateEstimate() {
+            if (!selectedFile) return;
+            
+            const quality = parseInt(qualitySlider.value);
+            let estimatedReduction;
+            
+            if (quality <= 3) estimatedReduction = 0.3;
+            else if (quality <= 5) estimatedReduction = 0.5;
+            else if (quality <= 7) estimatedReduction = 0.7;
+            else estimatedReduction = 0.85;
+            
+            const estimatedSize = selectedFile.size * estimatedReduction;
+            const reductionPercent = ((1 - estimatedReduction) * 100).toFixed(1);
+            
+            document.getElementById('estimatedSize').textContent = formatFileSize(estimatedSize);
+            document.getElementById('expectedReduction').textContent = `~${reductionPercent}%`;
+        }
+
+        async function compressFile() {
+            if (!selectedFile) {
+                showResults('No file selected', 'error');
+                return;
+            }
+
+            const compressBtn = document.getElementById('compressBtn');
+            compressBtn.disabled = true;
+            compressBtn.textContent = 'Compressing...';
+            
+            try {
+                const quality = parseInt(qualitySlider.value);
+                
+                if (typeof window.simpleCompressPDF === 'function') {
+                    const result = await window.simpleCompressPDF(selectedFile, quality);
+                    
+                    if (result.success) {
+                        // Download the compressed file
+                        downloadPDF(result.data, 'compressed.pdf');
+                        
+                        const message = `
+                            <h3>✅ Compression Successful!</h3>
+                            <p><strong>Original Size:</strong> ${formatFileSize(result.originalSize)}</p>
+                            <p><strong>Compressed Size:</strong> ${formatFileSize(result.compressedSize)}</p>
+                            <p><strong>Size Reduction:</strong> ${result.reduction}%</p>
+                            <p>File has been downloaded automatically.</p>
+                        `;
+                        showResults(message, 'success');
+                    } else {
+                        showResults('❌ Compression failed: ' + result.error, 'error');
+                    }
+                } else {
+                    showResults('❌ Compression library not available', 'error');
+                }
+            } catch (error) {
+                showResults('❌ Error: ' + error.message, 'error');
+            } finally {
+                compressBtn.disabled = false;
+                compressBtn.textContent = 'Compress PDF';
+            }
+        }
+
+        function downloadPDF(bytes, filename) {
+            const blob = new Blob([bytes], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        function showResults(message, type) {
+            results.innerHTML = message;
+            results.className = `results ${type}`;
+            results.style.display = 'block';
+        }
+
+        function hideResults() {
+            results.style.display = 'none';
+        }
+
+        function resetTest() {
+            selectedFile = null;
+            controls.style.display = 'none';
+            hideResults();
+            fileInput.value = '';
+            qualitySlider.value = 7;
+            updateQualityDisplay();
+        }
+
+        // Initialize
+        updateQualityDisplay();
+    </script>
+</body>
+</html>

@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrivPDF - Simple Version</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header {
+                margin-bottom: 1.5rem;
+            }
+
+            .tools-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .tool-card {
+                padding: 1.5rem;
+            }
+
+            .btn {
+                padding: 0.875rem 1.5rem;
+                font-size: 0.95rem;
+            }
+
+            .file-input {
+                padding: 0.875rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .tool-card {
+                padding: 1.25rem;
+            }
+
+            .tool-card h3 {
+                font-size: 1.25rem;
+            }
+
+            .btn {
+                padding: 0.75rem 1.25rem;
+                font-size: 0.9rem;
+            }
+
+            .file-input {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        .tool-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .tool-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .file-input {
+            width: 100%;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-input:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid rgba(255, 0, 0, 0.5);
+        }
+
+        .success {
+            background: rgba(0, 255, 0, 0.2);
+            border: 1px solid rgba(0, 255, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>PrivPDF Toolkit</h1>
+            <p>Simple, secure PDF tools that work entirely in your browser</p>
+        </div>
+
+        <div class="tools-grid">
+            <!-- Merge PDFs -->
+            <div class="tool-card">
+                <h3>📄 Merge PDFs</h3>
+                <p>Combine multiple PDF files into one document</p>
+                <input type="file" id="merge-input" class="file-input" accept=".pdf" multiple>
+                <button class="btn" onclick="mergePDFs()" disabled id="merge-btn">Merge PDFs</button>
+                <div id="merge-status" class="status" style="display: none;"></div>
+                <div id="merge-loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Merging PDFs...</p>
+                </div>
+            </div>
+
+            <!-- Split PDF -->
+            <div class="tool-card">
+                <h3>✂️ Split PDF</h3>
+                <p>Extract each page as a separate PDF</p>
+                <input type="file" id="split-input" class="file-input" accept=".pdf">
+                <button class="btn" onclick="splitPDF()" disabled id="split-btn">Split PDF</button>
+                <div id="split-status" class="status" style="display: none;"></div>
+                <div id="split-loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Splitting PDF...</p>
+                </div>
+            </div>
+
+            <!-- Compress PDF -->
+            <div class="tool-card">
+                <h3>🗜️ Compress PDF</h3>
+                <p>Reduce PDF file size</p>
+                <input type="file" id="compress-input" class="file-input" accept=".pdf">
+                <button class="btn" onclick="compressPDF()" disabled id="compress-btn">Compress PDF</button>
+                <div id="compress-status" class="status" style="display: none;"></div>
+                <div id="compress-loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Compressing PDF...</p>
+                </div>
+            </div>
+
+            <!-- Images to PDF -->
+            <div class="tool-card">
+                <h3>🖼️ Images to PDF</h3>
+                <p>Convert images to a single PDF</p>
+                <input type="file" id="images-input" class="file-input" accept="image/*" multiple>
+                <button class="btn" onclick="imagesToPDF()" disabled id="images-btn">Create PDF</button>
+                <div id="images-status" class="status" style="display: none;"></div>
+                <div id="images-loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Creating PDF...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load libraries with fallbacks -->
+    <script>
+        // Function to load script with fallback
+        function loadScriptWithFallback(urls, callback) {
+            let index = 0;
+            
+            function tryLoad() {
+                if (index >= urls.length) {
+                    callback(false);
+                    return;
+                }
+                
+                const script = document.createElement('script');
+                script.src = urls[index];
+                script.onload = () => callback(true);
+                script.onerror = () => {
+                    index++;
+                    tryLoad();
+                };
+                document.head.appendChild(script);
+            }
+            
+            tryLoad();
+        }
+        
+        // Load all libraries with fallbacks
+        let loadedLibraries = 0;
+        const totalLibraries = 3;
+        
+        function checkAllLoaded() {
+            loadedLibraries++;
+            if (loadedLibraries === totalLibraries) {
+                initializeApp();
+            }
+        }
+        
+        // Load PDF.js with multiple fallback URLs
+        loadScriptWithFallback([
+            'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.54/build/pdf.min.js',
+            'https://unpkg.com/pdfjs-dist@5.4.54/build/pdf.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+            'https://unpkg.com/pdfjs-dist@latest/build/pdf.min.js'
+        ], function(success) {
+            if (success) {
+                console.log('PDF.js loaded successfully');
+                // Set worker source with fallbacks
+                if (typeof pdfjsLib !== 'undefined') {
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.54/build/pdf.worker.min.js';
+                }
+            } else {
+                console.error('Failed to load PDF.js from all sources');
+            }
+            checkAllLoaded();
+        });
+        
+        // Load PDF-lib with fallbacks
+        loadScriptWithFallback([
+            'https://cdn.jsdelivr.net/npm/pdf-lib@1.16.0/dist/pdf-lib.min.js',
+            'https://unpkg.com/pdf-lib@1.16.0/dist/pdf-lib.min.js',
+            'https://unpkg.com/pdf-lib@latest/dist/pdf-lib.min.js'
+        ], function(success) {
+            if (success) {
+                console.log('PDF-lib loaded successfully');
+            } else {
+                console.error('Failed to load PDF-lib from all sources');
+            }
+            checkAllLoaded();
+        });
+        
+        // Load jsPDF with fallbacks
+        loadScriptWithFallback([
+            'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+            'https://cdn.jsdelivr.net/npm/jspdf@latest/dist/jspdf.umd.min.js',
+            'https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js',
+            'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'
+        ], function(success) {
+            if (success) {
+                console.log('jsPDF loaded successfully');
+                // jsPDF is accessible via window.jspdf (lowercase!)
+                if (typeof window.jspdf !== 'undefined') {
+                    window.jsPDF = window.jspdf.jsPDF; // Create uppercase alias for compatibility
+                }
+            } else {
+                console.error('Failed to load jsPDF from all sources');
+            }
+            checkAllLoaded();
+        });
+    </script>
+
+    <script>
+        // Global variables
+        let librariesReady = false;
+
+        // Initialize app after all libraries are loaded
+        function initializeApp() {
+            setTimeout(function() {
+                // Check for jsPDF in both possible locations
+                const jsPDFAvailable = (typeof window.jsPDF !== 'undefined') || (typeof window.jspdf !== 'undefined');
+                
+                if (typeof pdfjsLib !== 'undefined' && typeof PDFLib !== 'undefined' && jsPDFAvailable) {
+                    librariesReady = true;
+                    console.log('All libraries loaded successfully');
+                    console.log('PDF.js:', typeof pdfjsLib !== 'undefined' ? '✓' : '✗');
+                    console.log('PDF-lib:', typeof PDFLib !== 'undefined' ? '✓' : '✗');
+                    console.log('jsPDF:', jsPDFAvailable ? '✓' : '✗');
+                    setupFileInputs();
+                } else {
+                    console.error('Some libraries failed to load after multiple attempts');
+                    console.log('PDF.js:', typeof pdfjsLib !== 'undefined' ? '✓' : '✗');
+                    console.log('PDF-lib:', typeof PDFLib !== 'undefined' ? '✓' : '✗');
+                    console.log('jsPDF:', jsPDFAvailable ? '✓' : '✗');
+                    document.body.innerHTML = '<div style="text-align:center;margin-top:100px;color:white;"><h1>Error: Libraries failed to load</h1><p>This might be due to:</p><ul style="text-align:left;display:inline-block;"><li>Internet connection issues</li><li>CDN availability problems</li><li>Firewall or ad blocker restrictions</li></ul><p>Please try refreshing the page or check your internet connection.</p></div>';
+                }
+            }, 500);
+        }
+
+        // Fallback timeout
+        setTimeout(function() {
+            if (!librariesReady) {
+                console.error('Library loading timeout');
+                document.body.innerHTML = '<div style="text-align:center;margin-top:100px;color:white;"><h1>Library Loading Timeout</h1><p>The required libraries failed to load within 15 seconds.</p><p>Please check your internet connection and try again.</p><button onclick="location.reload()" style="margin-top:20px;padding:10px 20px;background:#667eea;color:white;border:none;border-radius:5px;cursor:pointer;">Refresh Page</button></div>';
+            }
+        }, 15000);
+
+        function setupFileInputs() {
+            // Merge PDFs
+            document.getElementById('merge-input').addEventListener('change', function(e) {
+                document.getElementById('merge-btn').disabled = e.target.files.length < 2;
+            });
+
+            // Split PDF
+            document.getElementById('split-input').addEventListener('change', function(e) {
+                document.getElementById('split-btn').disabled = e.target.files.length === 0;
+            });
+
+            // Compress PDF
+            document.getElementById('compress-input').addEventListener('change', function(e) {
+                document.getElementById('compress-btn').disabled = e.target.files.length === 0;
+            });
+
+            // Images to PDF
+            document.getElementById('images-input').addEventListener('change', function(e) {
+                document.getElementById('images-btn').disabled = e.target.files.length === 0;
+            });
+        }
+
+        function showStatus(id, message, type = 'success') {
+            const status = document.getElementById(id);
+            status.className = `status ${type}`;
+            status.textContent = message;
+            status.style.display = 'block';
+        }
+
+        function showLoading(id, show = true) {
+            document.getElementById(id).style.display = show ? 'block' : 'none';
+        }
+
+        function downloadPDF(bytes, filename) {
+            const blob = new Blob([bytes], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        async function mergePDFs() {
+            if (!librariesReady) {
+                showStatus('merge-status', 'Libraries not ready', 'error');
+                return;
+            }
+
+            const files = document.getElementById('merge-input').files;
+            if (files.length < 2) {
+                showStatus('merge-status', 'Please select at least 2 PDF files', 'error');
+                return;
+            }
+
+            showLoading('merge-loading', true);
+            
+            try {
+                const mergedPdf = await PDFLib.PDFDocument.create();
+                
+                for (const file of files) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await PDFLib.PDFDocument.load(arrayBuffer);
+                    const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                    pages.forEach(page => mergedPdf.addPage(page));
+                }
+                
+                const mergedBytes = await mergedPdf.save();
+                downloadPDF(mergedBytes, 'merged.pdf');
+                
+                showStatus('merge-status', `Successfully merged ${files.length} PDFs!`);
+            } catch (error) {
+                showStatus('merge-status', 'Error merging PDFs: ' + error.message, 'error');
+            } finally {
+                showLoading('merge-loading', false);
+            }
+        }
+
+        async function splitPDF() {
+            if (!librariesReady) {
+                showStatus('split-status', 'Libraries not ready', 'error');
+                return;
+            }
+
+            const file = document.getElementById('split-input').files[0];
+            if (!file) {
+                showStatus('split-status', 'Please select a PDF file', 'error');
+                return;
+            }
+
+            showLoading('split-loading', true);
+            
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await PDFLib.PDFDocument.load(arrayBuffer);
+                const pageCount = pdf.getPageCount();
+                
+                for (let i = 0; i < pageCount; i++) {
+                    const newPdf = await PDFLib.PDFDocument.create();
+                    const [page] = await newPdf.copyPages(pdf, [i]);
+                    newPdf.addPage(page);
+                    const bytes = await newPdf.save();
+                    downloadPDF(bytes, `page_${i + 1}.pdf`);
+                }
+                
+                showStatus('split-status', `Successfully split PDF into ${pageCount} files!`);
+            } catch (error) {
+                showStatus('split-status', 'Error splitting PDF: ' + error.message, 'error');
+            } finally {
+                showLoading('split-loading', false);
+            }
+        }
+
+        async function compressPDF() {
+            if (!librariesReady) {
+                showStatus('compress-status', 'Libraries not ready', 'error');
+                return;
+            }
+
+            const file = document.getElementById('compress-input').files[0];
+            if (!file) {
+                showStatus('compress-status', 'Please select a PDF file', 'error');
+                return;
+            }
+
+            showLoading('compress-loading', true);
+            
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await PDFLib.PDFDocument.load(arrayBuffer);
+                
+                // Simple compression by re-saving
+                const compressedBytes = await pdf.save();
+                downloadPDF(compressedBytes, 'compressed.pdf');
+                
+                const originalSize = file.size;
+                const compressedSize = compressedBytes.length;
+                const reduction = ((1 - compressedSize / originalSize) * 100).toFixed(1);
+                
+                showStatus('compress-status', `PDF compressed! Size reduction: ${reduction}%`);
+            } catch (error) {
+                showStatus('compress-status', 'Error compressing PDF: ' + error.message, 'error');
+            } finally {
+                showLoading('compress-loading', false);
+            }
+        }
+
+        async function imagesToPDF() {
+            if (!librariesReady) {
+                showStatus('images-status', 'Libraries not ready', 'error');
+                return;
+            }
+
+            const files = document.getElementById('images-input').files;
+            if (files.length === 0) {
+                showStatus('images-status', 'Please select image files', 'error');
+                return;
+            }
+
+            showLoading('images-loading', true);
+            
+            try {
+                const pdf = await PDFLib.PDFDocument.create();
+                
+                for (const file of files) {
+                    const imageBytes = await file.arrayBuffer();
+                    let image;
+                    
+                    if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
+                        image = await pdf.embedJpg(imageBytes);
+                    } else if (file.type === 'image/png') {
+                        image = await pdf.embedPng(imageBytes);
+                    } else {
+                        // Convert other formats to PNG
+                        const blob = new Blob([imageBytes], { type: file.type });
+                        const url = URL.createObjectURL(blob);
+                        const img = new Image();
+                        await new Promise((resolve, reject) => {
+                            img.onload = resolve;
+                            img.onerror = reject;
+                            img.src = url;
+                        });
+                        
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        
+                        const dataUrl = canvas.toDataURL('image/png');
+                        const base64 = dataUrl.split(',')[1];
+                        const pngBytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+                        image = await pdf.embedPng(pngBytes);
+                        
+                        URL.revokeObjectURL(url);
+                    }
+                    
+                    const page = pdf.addPage([image.width, image.height]);
+                    page.drawImage(image, {
+                        x: 0,
+                        y: 0,
+                        width: image.width,
+                        height: image.height
+                    });
+                }
+                
+                const pdfBytes = await pdf.save();
+                downloadPDF(pdfBytes, 'images.pdf');
+                
+                showStatus('images-status', `Successfully created PDF from ${files.length} images!`);
+            } catch (error) {
+                showStatus('images-status', 'Error creating PDF: ' + error.message, 'error');
+            } finally {
+                showLoading('images-loading', false);
+            }
+        }
+    </script>
+</body>
+</html>

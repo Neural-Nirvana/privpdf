@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrivPDF Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        #fileInput { margin: 10px 0; }
+        #output { margin-top: 20px; min-height: 100px; }
+    </style>
+</head>
+<body>
+    <h1>PrivPDF Library Test</h1>
+    
+    <div class="test-section">
+        <h2>Library Loading Test</h2>
+        <div id="libraryStatus">Testing libraries...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>PDF.js Test</h2>
+        <input type="file" id="fileInput" accept=".pdf">
+        <button onclick="testPDFJS()">Test PDF.js Loading</button>
+        <div id="pdfStatus"></div>
+        <canvas id="testCanvas" style="border: 1px solid #ccc; margin-top: 10px; max-width: 100%;"></canvas>
+    </div>
+
+    <div class="test-section">
+        <h2>PDF-lib Test</h2>
+        <button onclick="testPDFLib()">Create Test PDF with PDF-lib</button>
+        <div id="pdflibStatus"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>jsPDF Test</h2>
+        <button onclick="testJSPDF()">Create Test PDF with jsPDF</button>
+        <div id="jspdfStatus"></div>
+    </div>
+
+    <div id="output"></div>
+
+    <!-- Load libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.54/build/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.16.0/dist/pdf-lib.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+
+    <script>
+        // Set up PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.54/build/pdf.worker.min.js';
+
+        // Test library loading
+        function testLibraries() {
+            const libraryStatus = document.getElementById('libraryStatus');
+            const tests = [];
+
+            // Test PDF.js
+            if (typeof pdfjsLib !== 'undefined') {
+                tests.push('<span class="success">✓ PDF.js loaded successfully</span>');
+            } else {
+                tests.push('<span class="error">✗ PDF.js failed to load</span>');
+            }
+
+            // Test PDF-lib
+            if (typeof PDFLib !== 'undefined') {
+                tests.push('<span class="success">✓ PDF-lib loaded successfully</span>');
+            } else {
+                tests.push('<span class="error">✗ PDF-lib failed to load</span>');
+            }
+
+            // Test jsPDF
+            if (typeof window.jsPDF !== 'undefined') {
+                tests.push('<span class="success">✓ jsPDF loaded successfully</span>');
+            } else {
+                tests.push('<span class="error">✗ jsPDF failed to load</span>');
+            }
+
+            libraryStatus.innerHTML = tests.join('<br>');
+        }
+
+        // Test PDF.js functionality
+        async function testPDFJS() {
+            const fileInput = document.getElementById('fileInput');
+            const pdfStatus = document.getElementById('pdfStatus');
+            
+            if (!fileInput.files[0]) {
+                pdfStatus.innerHTML = '<div class="error">Please select a PDF file first</div>';
+                return;
+            }
+
+            try {
+                pdfStatus.innerHTML = '<div class="info">Loading PDF...</div>';
+                
+                const file = fileInput.files[0];
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                
+                pdfStatus.innerHTML = `<div class="success">✓ PDF loaded successfully! Pages: ${pdf.numPages}</div>`;
+                
+                // Render first page
+                const page = await pdf.getPage(1);
+                const viewport = page.getViewport({ scale: 1.0 });
+                
+                const canvas = document.getElementById('testCanvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                
+                await page.render({
+                    canvasContext: context,
+                    viewport: viewport
+                }).promise;
+                
+                pdfStatus.innerHTML += '<div class="success">✓ First page rendered successfully!</div>';
+                
+            } catch (error) {
+                pdfStatus.innerHTML = `<div class="error">✗ PDF.js test failed: ${error.message}</div>`;
+            }
+        }
+
+        // Test PDF-lib functionality
+        async function testPDFLib() {
+            const pdflibStatus = document.getElementById('pdflibStatus');
+            
+            try {
+                pdflibStatus.innerHTML = '<div class="info">Creating PDF with PDF-lib...</div>';
+                
+                const pdfDoc = await PDFLib.PDFDocument.create();
+                const page = pdfDoc.addPage([600, 400]);
+                
+                const font = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+                
+                page.drawText('Hello from PDF-lib!', {
+                    x: 50,
+                    y: 350,
+                    size: 30,
+                    font: font,
+                    color: PDFLib.rgb(0, 0.53, 0.71),
+                });
+                
+                page.drawText('This is a test PDF created with PDF-lib', {
+                    x: 50,
+                    y: 300,
+                    size: 16,
+                    font: font,
+                    color: PDFLib.rgb(0, 0, 0),
+                });
+                
+                const pdfBytes = await pdfDoc.save();
+                
+                // Download the PDF
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'pdflib-test.pdf';
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                pdflibStatus.innerHTML = '<div class="success">✓ PDF-lib test successful! PDF downloaded.</div>';
+                
+            } catch (error) {
+                pdflibStatus.innerHTML = `<div class="error">✗ PDF-lib test failed: ${error.message}</div>`;
+            }
+        }
+
+        // Test jsPDF functionality
+        function testJSPDF() {
+            const jspdfStatus = document.getElementById('jspdfStatus');
+            
+            try {
+                jspdfStatus.innerHTML = '<div class="info">Creating PDF with jsPDF...</div>';
+                
+                const { jsPDF } = window.jsPDF;
+                const doc = new jsPDF();
+                
+                doc.setFontSize(20);
+                doc.text('Hello from jsPDF!', 20, 30);
+                
+                doc.setFontSize(12);
+                doc.text('This is a test PDF created with jsPDF', 20, 50);
+                doc.text('Date: ' + new Date().toLocaleString(), 20, 70);
+                
+                // Add some shapes
+                doc.setDrawColor(0, 100, 200);
+                doc.rect(20, 90, 50, 30);
+                
+                doc.setFillColor(255, 100, 100);
+                doc.circle(100, 105, 10, 'F');
+                
+                doc.save('jspdf-test.pdf');
+                
+                jspdfStatus.innerHTML = '<div class="success">✓ jsPDF test successful! PDF downloaded.</div>';
+                
+            } catch (error) {
+                jspdfStatus.innerHTML = `<div class="error">✗ jsPDF test failed: ${error.message}</div>`;
+            }
+        }
+
+        // Run library tests on page load
+        window.addEventListener('load', function() {
+            setTimeout(testLibraries, 1000); // Give libraries time to load
+        });
+    </script>
+</body>
+</html>
